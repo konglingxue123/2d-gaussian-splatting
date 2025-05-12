@@ -1,0 +1,1 @@
+python render.py -s /home/ubunto/Project/konglx/pcd/3dgs/gaussian-splatting-main/datasets/tea_pot_colmap_this -m /home/ubunto/Project/konglx/pcd/2dgs/2d-gaussian-splatting-main/output/d8581422-5 --skip_test --skip_train

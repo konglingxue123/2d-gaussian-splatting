@@ -1,0 +1,21 @@
+1、用原始rgb的图像进行colmap的sparse特征和位姿获取；（用SIMPLE_PINHOLE或PINHOLE，推荐用SIMPLE_PINHOLE）【该步骤直接获取transforms.json文件，包含内外参，以及自己提取的R，T矩阵在transforms.json中】
+	命令1：将colmap2nerf_this_for_open3d_show.py文件放在指定dataset的文件夹内，与images同级
+	 python colmap2nerf_this_for_open3d_show.py --run_colmap
+	命令2：
+	用colmap读取sparse的特征和位姿，并保存为.ply文件，命名为sparse.ply
+	 
+2、特别地，通过1_add_area_and_projection_one_image.py或add_area_and_projection_all_image.py可以在open3d展示图像
+
+3、基于inspyrenet或sam2unet进行显著性检测（rgb转为rgba）
+	将原来images的rgb图像替换为rgba图像
+	
+4、2dgs生成
+	命令：
+	对于rgba图像：python train.py -s /home/ubunto/Project/konglx/pcd/3dgs/gaussian-splatting-main/datasets/tea_pot_colmap_this_rgba -e png
+	对于rgb图像：python train.py -s /home/ubunto/Project/konglx/pcd/3dgs/gaussian-splatting-main/datasets/tea_pot_colmap_this_rgb
+
+5、tsdf进行网格生成：
+	命令：
+	python render.py -s /home/ubunto/Project/konglx/pcd/3dgs/gaussian-splatting-main/datasets/tea_pot_colmap_this_rgba -m /home/ubunto/Project/konglx/pcd/2dgs/2d-gaussian-splatting-main/output/c927088d-5
+
+6、进行刘飞宇的相机原点-图像-mesh的映射
