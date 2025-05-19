@@ -1,8 +1,9 @@
 1、用原始rgb的图像进行colmap的sparse特征和位姿获取；（用SIMPLE_PINHOLE或PINHOLE，推荐用SIMPLE_PINHOLE）【该步骤直接获取transforms.json文件，包含内外参，以及自己提取的R，T矩阵在transforms.json中】
 	命令1：将colmap2nerf_this_for_open3d_show.py文件放在指定dataset的文件夹内，与images同级
-	 python colmap2nerf_this_for_open3d_show.py --run_colmap
-	命令2：
-	用colmap读取sparse的特征和位姿，并保存为.ply文件，命名为sparse.ply
+	 1.1 若是图片：python colmap2nerf_this_for_open3d_show.py --run_colmap
+	 1.2 若是视频：python colmap2nerf_this_for_open3d_show.py --video_in video_name.mp4 --video_fps 30 --run_colmap
+
+
 	 
 2、特别地，通过1_add_area_and_projection_one_image.py或add_area_and_projection_all_image.py可以在open3d展示图像
 
