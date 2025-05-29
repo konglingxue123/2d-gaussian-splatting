@@ -1,12 +1,15 @@
+0、先將images文件中的文件名按照数字顺序命名最好8位数字，即，00000001.jpg, 00000002.jpg
+【这样便于后续的处理，例如MVS的pair.txt文件的对应关系，在https://github.com/YoYo000/MVSNet 中的colmap2mvsnet.py文件中也有相应的要求】
+
 1、用原始rgb的图像进行colmap的sparse特征和位姿获取；（用SIMPLE_PINHOLE或PINHOLE，推荐用SIMPLE_PINHOLE）【该步骤直接获取transforms.json文件，包含内外参，以及自己提取的R，T矩阵在transforms.json中】
 	命令1：将colmap2nerf_this_for_open3d_show.py文件放在指定dataset的文件夹内，与images同级
 	 1.1 若是图片：python colmap2nerf_this_for_open3d_show.py --run_colmap
 	 1.2 若是视频：python colmap2nerf_this_for_open3d_show.py --video_in video_name.mp4 --video_fps 30 --run_colmap
 
 
-	 
+##### 若展示
 2、特别地，通过1_add_area_and_projection_one_image.py或add_area_and_projection_all_image.py可以在open3d展示图像
-
+#### 若用RGBA图像
 3、基于inspyrenet或sam2unet进行显著性检测（rgb转为rgba）
 	将原来images的rgb图像替换为rgba图像
 	
@@ -17,6 +20,8 @@
 
 5、tsdf进行网格生成：
 	命令：
+	# rgb图片->jpg格式
 	python render.py -s /home/ubunto/Project/konglx/pcd/3dgs/gaussian-splatting-main/datasets/tea_pot_colmap_this_rgba -m /home/ubunto/Project/konglx/pcd/2dgs/2d-gaussian-splatting-main/output/c927088d-5
-
+	# rgba图片->png格式
+	python render.py -s /home/ubunto/Project/konglx/pcd/3dgs/gaussian-splatting-main/datasets/tea_pot_colmap_this_rgba -m /home/ubunto/Project/konglx/pcd/2dgs/2d-gaussian-splatting-main/output/c927088d-5 -e png
 6、进行刘飞宇的相机原点-图像-mesh的映射
