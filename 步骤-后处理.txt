@@ -1,0 +1,17 @@
+0.基于2dgs通过tsdf得到的fused_post.ply的mesh，对原始点云进行后处理，得到最终的点云。
+1.通过 tools/裂缝骨架的scikit-image的demo_dalian.ipynb脚本，对语义分割检测到的mask进行裂缝骨架分割--->得到不同类别损伤的裂缝和spalling的骨架和最大宽度。
+    格式类似于
+    cls_num_skel_all_dict =  # 含有骨架类别，类别对应的个数，及其位置和宽度信息
+                {1:[array(mask1), array(mask2), array(mask3)], 
+                2:[array(mask2)], 
+                3:[array(mask3)]} [这样即有类别，又有每个类别对应的mask]
+
+    all_data = cls_num_skel_all_dict[1] + cls_num_skel_all_dict[2]
+
+    # 归一化显示（便于plt显示）
+
+    all_data_norm = (all_data - np.min(all_data)) / (np.max(all_data) - np.min(all_data))
+
+2.根据1中的骨架和最大宽度【提取的字典】
+    cls_num_skel_all_dict 的信息，在“1_add_area_and_projection_one_image_using_tranforms_json_file_from_colmap2nerf_py_file_then_draw_ray_then_projection_points_this_dalian_xinghaiwandaqiao_add_crack_skeleton(原图裂缝骨架贴图到原始图片，增加marker的4个角点).py”
+    中映射损伤（可能一次映射直接展示所有的损伤情况硬件无法实现，但是可以通过后处理的点云和mesh文件读取实现展示）
