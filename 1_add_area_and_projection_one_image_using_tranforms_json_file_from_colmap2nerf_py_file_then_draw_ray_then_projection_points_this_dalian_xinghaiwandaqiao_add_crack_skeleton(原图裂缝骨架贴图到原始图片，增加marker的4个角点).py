@@ -723,8 +723,8 @@ elif mesh_dir is not None and camera_center_coords is not None:
                   'all_colors_list:' : crack_mask_magma_np_color_not_zero_list,
                   'only_defects_cls_length:': cls_num_of_points_and_colors_dict}
 
-    
-    np.save(os.path.join(f'{save_output_mesh_ray_dir}', f'hit_points_colors_img_id={img_name}_makers.npy'), pcd_color_dict )
+    os.makedirs(os.path.join(f'{save_output_mesh_ray_dir}/hit_points'), exist_ok=True)
+    np.save(os.path.join(f'{save_output_mesh_ray_dir}/hit_points', f'hit_points_colors_makers_img_name={img_name}.npy'), pcd_color_dict )
     # np_rand_dot_color = np.array([[1, 0, 0]] * world_coords.shape[0])
     # np_rand_dot_color = img_np_reshape
     # 添加原始点云的颜色
@@ -761,8 +761,8 @@ elif mesh_dir is not None and camera_center_coords is not None:
     # 设置点云中点的大小
     opt.point_size = 3.0  # 可以根据需要调整点的大小
     # 保存可视化结果
-    o3d.io.write_point_cloud(os.path.join(f'{save_output_mesh_ray_dir}', f'scene_added_area_skeleton_org_size_mask_img_id={img_name}_makers.ply'), pcd)
-    print(f'已保存可视化结果: {save_output_mesh_ray_dir}/scene_added_area_skeleton_org_size_mask_img_id={img_name}_makers.ply')
+    o3d.io.write_point_cloud(os.path.join(f'{save_output_mesh_ray_dir}', f'scene_added_area_skeleton_org_size_mask_makers_img_id={img_name}.ply'), pcd)
+    print(f'已保存可视化结果: {save_output_mesh_ray_dir}/scene_added_area_skeleton_org_size_mask_makers_img_name={img_name}.ply')
     
     # 将pcd，coor，ray_hit_mesh合并为一个可视化结果
     original_mesh_points = np.asarray(mesh.vertices)
@@ -776,8 +776,8 @@ elif mesh_dir is not None and camera_center_coords is not None:
     # 保存mesh
     
     
-    o3d.io.write_triangle_mesh(os.path.join(f'{save_output_mesh_ray_dir}', f'ray_hit_mesh_skeleton_org_size_mask_img_id={img_name}_makers.ply'), mesh)
-    print(f'已保存可视化结果: {save_output_mesh_ray_dir}/ray_hit_mesh_skeleton_org_size_mask_img_id={img_name}_makers.ply')
+    o3d.io.write_triangle_mesh(os.path.join(f'{save_output_mesh_ray_dir}', f'ray_hit_mesh_skeleton_org_size_mask_makers_img_id={img_name}.ply'), mesh)
+    print(f'已保存可视化结果: {save_output_mesh_ray_dir}/ray_hit_mesh_skeleton_org_size_mask_makers_img_name={img_name}.ply')
     # o3d.io.write_point_cloud(os.path.join(f'{save_output_mesh_ray_dir}', 'pcd.ply'), pcd)
     
     vizualizer.run()  
