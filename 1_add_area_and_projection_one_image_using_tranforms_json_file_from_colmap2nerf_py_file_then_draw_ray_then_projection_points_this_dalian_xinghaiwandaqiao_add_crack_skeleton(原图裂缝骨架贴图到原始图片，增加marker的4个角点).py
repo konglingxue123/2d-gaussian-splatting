@@ -176,6 +176,7 @@ mask_dir = '/home/ubunto/Project/konglx/pcd/2dgs/2d-gaussian-splatting-main/data
 crack_mask_magma_dir = f'{mask_dir}/{img_name}.png'
 # crack_mask_magma_dir = '/home/ubunto/Project/konglx/pcd/2dgs/2d-gaussian-splatting-main/output/projection/CFD_044.jpg'
 crack_mask_magma_pil_l = Image.open(crack_mask_magma_dir)
+print('转换l前的np.unique(crack_mask_magma_pil_l_np)', np.unique(np.array(crack_mask_magma_pil_l)))
 marker_point_zero_np = np.zeros((crack_mask_magma_pil_l.size[1], crack_mask_magma_pil_l.size[0])).astype(np.uint8)
 print('marker_point_zero_np.shape', marker_point_zero_np.shape, np.unique(marker_point_zero_np))
 
@@ -198,7 +199,7 @@ for i in range(corners[0][0].shape[0]):
 #             (corners[0][0][3][0], corners[0][0][3][1])], fill='green')
 ###################################
 
-crack_mask_magma_pil_l = crack_mask_magma_pil_l.convert('L')
+# crack_mask_magma_pil_l = crack_mask_magma_pil_l.convert('L')
 crack_mask_magma_pil_l_np = np.array(crack_mask_magma_pil_l)
 print(crack_mask_magma_pil_l_np.shape, np.unique(crack_mask_magma_pil_l_np))
 
