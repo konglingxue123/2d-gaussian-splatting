@@ -280,6 +280,7 @@ def get_crack_mask_np_from_any_edge(num_classes, crack_mask_magma_pil_l_np, cls_
 def get_crack_mask_np_from_pair_edge(num_classes, crack_mask_magma_pil_l_np, cls_num_edge_pair_dict):
     x_order_list = []
     y_order_list = []
+    # xy_order_list = []
     for cls in range(1, num_classes+1):
         try:
             crack_edge_list = cls_num_edge_pair_dict[cls]
@@ -291,6 +292,7 @@ def get_crack_mask_np_from_pair_edge(num_classes, crack_mask_magma_pil_l_np, cls
                 # crack_mask_magma_pil_l_np中，在crack_edge一系列点的位置坐标处，设置为255
                 crack_mask_magma_pil_l_np[crack_edge[:, 0], crack_edge[:, 1]] = cls
                 crack_mask_magma_pil_l_np[crack_edge[:, 2], crack_edge[:, 3]] = cls
+
                 x_order_list.append(crack_edge[:, 0])
                 x_order_list.append(crack_edge[:, 2])
                 y_order_list.append(crack_edge[:, 1])
@@ -333,8 +335,8 @@ mask_zero_same_size, mask_zero_same_size_pil_l = crack_mask_magma_pil_l_np, crac
 
 print('mask_zero_same_size.shape', mask_zero_same_size.shape) # h, w = (1080, 1920)
 
-plt.imshow(crack_mask_magma_pil_l_np)
-plt.show()
+# plt.imshow(crack_mask_magma_pil_l_np)
+# plt.show()
 
 # img_with_mask_dir = f'/home/ubunto/Project/konglx/pcd/2dgs/2d-gaussian-splatting-main/datasets/beijing_baigeqiao_video_input_to_rgb_with_label/images/{selected_image_name}.jpg'
 # result_image_magma, mask_zero_same_size_rgb_pil = merge_imgs_pil_and_masks_dir(im, img_name, mask_dir, color_list=class_colors_list)
@@ -607,8 +609,8 @@ for frame in frames_data:
 # 生成网格点矩阵
 marker_point_id = np.where(marker_point_zero_np !=0)
 print(marker_point_id[0].shape, marker_point_id[1].shape)
-x_marker_points = marker_point_id[1]
-y_marker_points = marker_point_id[0]
+x_marker_points = marker_point_id[0]
+y_marker_points = marker_point_id[1]
 
 
 print('np.unique(mask_zero_same_size):', np.unique(mask_zero_same_size), mask_zero_same_size.shape)
@@ -617,31 +619,50 @@ print('np.unique(mask_zero_same_size):', np.unique(mask_zero_same_size), mask_ze
 # 按照mask的标签数值进行统计
 unique_mask_zero_same_size = np.unique(mask_zero_same_size)
 
-defect_cls_dict = {}
+defect_cls_dict = {k: [np.round(arr).astype(int) for arr in v] for k, v in cls_num_edge_pair_dict.items()}
 
-for i in unique_mask_zero_same_size.tolist():
-    if i == 0:
-        continue
-    else:
-        defect_cls_dict[i] = []
-        defect_cls_dict[i].append(np.where(mask_zero_same_size == i))
+# for i in unique_mask_zero_same_size.tolist():
+#     if i == 0:
+#         continue
+#     else:
+#         defect_cls_dict[i] = []
+#         defect_cls_dict[i].append(np.where(mask_zero_same_size == i))
         
 print('defect_cls_dict:', defect_cls_dict)
 print(list(defect_cls_dict.keys()))
 # print(defect_cls_dict[list(defect_cls_dict.keys())[0]])
 # np.save(os.path.join(render_mesh_dir, 'defect_cls_dict.npy'), defect_cls_dict)
 
-
+# 颜色顺序
+# cls_num_of_points_and_colors_dict = {}
+# for i in list(defect_cls_dict.keys()):
+#     cls_num_of_points_and_colors_dict[i] = defect_cls_dict[i][0][0].shape[0]
+#     # cls_num_of_points_and_colors_dict[i].append()
+# print('cls_num_of_points_and_colors_dict:', cls_num_of_points_and_colors_dict)
 cls_num_of_points_and_colors_dict = {}
 for i in list(defect_cls_dict.keys()):
-    cls_num_of_points_and_colors_dict[i] = defect_cls_dict[i][0][0].shape[0]
+    cls_num_of_points_and_colors_dict[i] = 2*defect_cls_dict[i][0].shape[0]
     # cls_num_of_points_and_colors_dict[i].append()
 print('cls_num_of_points_and_colors_dict:', cls_num_of_points_and_colors_dict)
 
+# for i in range(len(defect_cls_dict.keys())):
+#     x_defects_in_img = np.hstack((defect_cls_dict[list(defect_cls_dict.keys())[0]][0][1], defect_cls_dict[list(defect_cls_dict.keys())[1]][0][1]))
+#     y_defects_in_img = np.hstack((defect_cls_dict[list(defect_cls_dict.keys())[0]][0][0], defect_cls_dict[list(defect_cls_dict.keys())[1]][0][0]))
+x_defects_list = []
+y_defects_list = []
 
-for i in range(len(defect_cls_dict.keys())):
-    x_defects_in_img = np.hstack((defect_cls_dict[list(defect_cls_dict.keys())[0]][0][1], defect_cls_dict[list(defect_cls_dict.keys())[1]][0][1]))
-    y_defects_in_img = np.hstack((defect_cls_dict[list(defect_cls_dict.keys())[0]][0][0], defect_cls_dict[list(defect_cls_dict.keys())[1]][0][0]))
+for i in defect_cls_dict.keys():
+    for j in range(len(defect_cls_dict[i])):
+        for k in range(len(defect_cls_dict[i][j])):
+            x_defects_list.append(np.hstack((defect_cls_dict[i][j][k][0], defect_cls_dict[i][j][k][2])))
+            y_defects_list.append(np.hstack((defect_cls_dict[i][j][k][1], defect_cls_dict[i][j][k][3])))
+            # x_defects_in_img = np.hstack((defect_cls_dict[i][j][k][0], defect_cls_dict[i][j][k][2]))
+            # y_defects_in_img = np.hstack((defect_cls_dict[i][j][k][1], defect_cls_dict[i][j][k][3]))
+x_defects_in_img = np.hstack(x_defects_list)
+y_defects_in_img = np.hstack(y_defects_list)
+# for i in range(len(defect_cls_dict.keys())):
+#     x_defects_in_img = np.hstack((defect_cls_dict[list(defect_cls_dict.keys())[0]][0][0], defect_cls_dict[list(defect_cls_dict.keys())[1]][0][0]))
+#     y_defects_in_img = np.hstack((defect_cls_dict[list(defect_cls_dict.keys())[0]][0][1], defect_cls_dict[list(defect_cls_dict.keys())[1]][0][1]))
 # print(x_order_list, y_order_list)
 # x_defects_in_img = np.hstack(x_order_list)
 # y_defects_in_img = np.hstack(y_order_list)
@@ -675,8 +696,8 @@ crack_mask_magma_np_color_not_zero_list = []
 # 提取损伤和marker的3d点和颜色
 
 for id, defect_point in enumerate(defects_area_np):
-    defects_area_mask_world_list.append(world_coords[defect_point[0] + (defect_point[1]-1)*w])
-    crack_mask_magma_np_color_not_zero_list.append((mask_zero_same_size_rgb_np[defect_point[1], defect_point[0], :] / 255.0).tolist())
+    defects_area_mask_world_list.append(world_coords[defect_point[1] + (defect_point[0]-1)*w])
+    crack_mask_magma_np_color_not_zero_list.append((mask_zero_same_size_rgb_np[defect_point[0], defect_point[1], :] / 255.0).tolist())
 
 
 defects_area_mask_world = np.array(defects_area_mask_world_list)
@@ -840,12 +861,16 @@ elif mesh_dir is not None and camera_center_coords is not None:
     # 按照类别对hitpoints存储
     cls_hitpoints_dict = {}
     cls_hitpoints_color_dict = {}
+    cls_dist_each_3d_point_dict = {}
+    cls_center_points_dict = {}
     for cls in range(1, num_classes+1):
         
 
         try:
-            cls_hitpoints_dict[cls] = [[] for i in range(len(defect_cls_dict[cls]))]
-            cls_hitpoints_color_dict[cls] = [[] for i in range(len(defect_cls_dict[cls]))]
+            cls_hitpoints_dict[cls] = [[] for i in range(len(defect_cls_dict[cls])*2)]
+            cls_hitpoints_color_dict[cls] = [[] for i in range(len(defect_cls_dict[cls])*2)]
+            cls_dist_each_3d_point_dict[cls] = [[] for i in range(len(defect_cls_dict[cls]))]
+            cls_center_points_dict[cls] = [[] for i in range(len(defect_cls_dict[cls]))]
             # cls_hitpoints_dict[cls] = []
             # cls_hitpoints_color_dict[cls] = []
             
@@ -853,8 +878,20 @@ elif mesh_dir is not None and camera_center_coords is not None:
             for i, cls_item in enumerate(cls_list):
                 # cls_hitpoints_color_dict[cls][i] = []
                 for points_id in range(len(cls_item)):
+                    points_id = points_id * 2
                     cls_hitpoints_dict[cls][i].append(hit_points[points_id])
-                    cls_hitpoints_color_dict
+                    cls_hitpoints_dict[cls][i+1].append(hit_points[points_id+1])
+                    # 3维点的距离
+                    dist_each_3d_point = distance(hit_points[points_id], hit_points[points_id+1])
+                    cls_dist_each_3d_point_dict[cls][i].append(dist_each_3d_point)
+                    
+                    # 计算中心点
+                    center_point = (hit_points[points_id] + hit_points[points_id+1]) / 2
+                    cls_center_points_dict[cls][i].append(center_point)
+                    
+                    
+                    cls_hitpoints_color_dict[cls][i].append(cls)
+                    cls_hitpoints_color_dict[cls][i+1].append(cls)
             
         except Exception as e:
             # print('出错内容：', e)
@@ -866,6 +903,8 @@ elif mesh_dir is not None and camera_center_coords is not None:
                   'only_defects_cls_length': cls_num_of_points_and_colors_dict,
                   'each_cls_num_points': cls_hitpoints_dict,
                   'each_cls_colors': cls_hitpoints_color_dict,
+                  'cls_dist_each_3d_point_dict': cls_dist_each_3d_point_dict,
+                  'cls_center_points_dict': cls_center_points_dict,
                   'mmp3dp': mmp3dp}
 
     npy_save_dir = os.path.join(f'{save_output_mesh_ray_dir}', f'hit_points_from_2d_npy_with_markers')
@@ -960,3 +999,39 @@ elif mesh_dir is not None and camera_center_coords is None:
 # 存储点云
 # o3d.io.write_point_cloud('scene_added_area.ply', pcd)
 vizualizer.destroy_window()
+
+
+
+# 找npy成对出现的边界点对应的位置
+# print(x_order_list, len(x_order_list))
+# print(y_order_list, len(y_order_list))
+
+xy_order_list = []
+for i in range(len(x_order_list)):
+    x_order_list_array = np.array(x_order_list[i]) 
+    y_order_list_array = np.array(y_order_list[i]) 
+
+    xy_order_list.append(np.column_stack((x_order_list_array.ravel(), y_order_list_array.ravel())))
+
+# print('xy_order_list:', xy_order_list, len(xy_order_list))
+# xy_order_list_array = np.vstack(xy_order_list)
+# print('xy_order_list_array.shape:', xy_order_list_array.shape)
+# print('xy_order_list_array:', xy_order_list_array)
+
+# print('x_order_list_array:', x_order_list_array)
+# print('defects_area_np.shape:', defects_area_np.shape)
+# print('defects_area_np:', defects_area_np)
+# order_np = np.array([np.where(( defects_area_np == row).all(axis=1))[0][0] for row in xy_order_list_array])
+# print('order_np:', order_np)
+
+# open3d显示defects_area_mask_world 的点
+# pcd = o3d.geometry.PointCloud()
+# # pcd.points = o3d.utility.Vector3dVector(hit_points[:10])
+# pcd.paint_uniform_color([1, 0, 0])
+# o3d.visualization.draw_geometries([pcd])
+
+# dist_3d_points_dict = {}
+# for cls_type in cls_num_of_points_and_colors_dict.keys():
+#     dist_3d_points_dict[cls_type] = []
+#     for i in range(cls_hitpoints_color_dict[cls_type]):
+#         dist_3d_points_dict[cls_type].append(distance(cls_hitpoints_dict[cls_type][i], chosen_camera_center_coords[0]))
