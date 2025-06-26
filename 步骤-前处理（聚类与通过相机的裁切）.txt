@@ -1,0 +1,9 @@
+
+1、先运行train.py，在datasets/your project/colmap_sparse/0 中生成point3D.ply,
+    然后终止训练，通过“读取colmap的bin和txt文件并聚类过滤噪点处理.ipynb”的“keep_and_remove_points_org_green”function得到边框的min_xyz, max_xyz, vertices;
+    再通过meshlab读取point3D.ply，将边框的min_xyz, max_xyz作为边界，（在Filters -> selection -> conditional vertex selection中，输入条件：
+    (x >= xyz_min) && (x <= xyz_max) &&   
+    (y >= xyz_min) && (y <= xyz_max) &&   
+    (z >= xyz_min) && (z <= xyz_max) 
+     ）
+2、用cluster方法进行二次聚类筛选
