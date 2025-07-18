@@ -64,8 +64,8 @@ print('mtx:\n', mtx)
 print('dist:\n', dist, np.array(dist).shape)
 
 
-# img_name = '0001'
-img_name = '0032'
+img_name = '0001'
+# img_name = '0032'
 colmap_dir = '/home/ubunto/Project/konglx/pcd/2dgs/2d-gaussian-splatting-main/datasets/dalian_xinghaiwandaqiao_video_input_rgb'
 # render_mesh_dir = '/home/ubunto/Project/konglx/pcd/2dgs/2d-gaussian-splatting-main/output/dalian_xinghaiwandaqiao_rgb'
 # render_mesh_dir =  '/home/ubunto/Project/konglx/pcd/2dgs/2d-gaussian-splatting-main/output/dalian_xinghaiwandaqiao_rgba'
@@ -75,23 +75,34 @@ save_output_mesh_ray_dir = f'{render_mesh_dir}/based_on_2d_npy_file_edge'
 os.makedirs(save_output_mesh_ray_dir, exist_ok=True)
 org_img_dir = f'/home/ubunto/Project/konglx/pcd/2dgs/2d-gaussian-splatting-main/datasets/dalian_xinghaiwandaqiao_video_input_rgb/outputs/labelme_outputs/JPEGImages'
 
+img_dir = f'{colmap_dir}/images/{img_name}.jpg'
+
+im = Image.open(img_dir)
 
 
-frame = cv2.imread(os.path.join(org_img_dir, img_name+'.jpg'))
-#调整图片大小
-# frame=cv2.resize(frame,None,fx=0.2,fy=0.2,interpolation=cv2.INTER_CUBIC)
-frame=cv2.resize(frame,None,fx=1,fy=1,interpolation=cv2.INTER_CUBIC)
-#灰度话
-gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-#设置预定义的字典
-aruco_dict = aruco.getPredefinedDictionary(aruco.DICT_6X6_250)
-#使用默认值初始化检测器参数
-parameters =  aruco.DetectorParameters()
-#使用aruco.detectMarkers()函数可以检测到marker，返回ID和标志板的4个角点坐标
-corners, ids, rejectedImgPoints = aruco.detectMarkers(gray,aruco_dict,parameters=parameters)
-print("corners:",corners, corners[0].shape)
+if img_name == '0032':
+
+    frame = cv2.imread(os.path.join(org_img_dir, img_name+'.jpg'))
+    #调整图片大小
+    # frame=cv2.resize(frame,None,fx=0.2,fy=0.2,interpolation=cv2.INTER_CUBIC)
+    frame=cv2.resize(frame,None,fx=1,fy=1,interpolation=cv2.INTER_CUBIC)
+    #灰度话
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    #设置预定义的字典
+    aruco_dict = aruco.getPredefinedDictionary(aruco.DICT_6X6_250)
+    #使用默认值初始化检测器参数
+    parameters =  aruco.DetectorParameters()
+    #使用aruco.detectMarkers()函数可以检测到marker，返回ID和标志板的4个角点坐标
+    corners, ids, rejectedImgPoints = aruco.detectMarkers(gray,aruco_dict,parameters=parameters)
+    print("corners:",corners, corners[0].shape)
 
 
+    # 在im上绘制绿色的4个角点
+    draw = ImageDraw.Draw(im)
+    draw.point([(corners[0][0][0][0], corners[0][0][0][1]), 
+                (corners[0][0][1][0], corners[0][0][1][1]), 
+                (corners[0][0][2][0], corners[0][0][2][1]),
+                (corners[0][0][3][0], corners[0][0][3][1])], fill='green')
 ##########################################################################################################################################################################
 num_classes = 3
 
@@ -110,15 +121,7 @@ dilate_size = 1
 # add_xy1 = [900, 600]
 # add_xy2 = [650, 650]
 
-img_dir = f'{colmap_dir}/images/{img_name}.jpg'
 
-im = Image.open(img_dir)
-# 在im上绘制绿色的4个角点
-draw = ImageDraw.Draw(im)
-draw.point([(corners[0][0][0][0], corners[0][0][0][1]), 
-            (corners[0][0][1][0], corners[0][0][1][1]), 
-            (corners[0][0][2][0], corners[0][0][2][1]),
-            (corners[0][0][3][0], corners[0][0][3][1])], fill='green')
 # draw.rectangle((np.min(corners[0][0][:, 0], axis=0), np.min(corners[0][0][:, 1], axis=0), np.max(corners[0][0][:, 0], axis=0), np.max(corners[0][0][:, 1], axis=0)), outline='red')
 # draw.rectangle((add_xy1[0]-dilate_size, add_xy1[1]-dilate_size, add_xy1[0]+dilate_size, add_xy1[1]+dilate_size), outline='green')
 im_np = np.array(im)
@@ -226,11 +229,12 @@ print('转换l前的np.unique(crack_mask_magma_pil_l_np)', np.unique(np.array(cr
 marker_point_zero_np = np.zeros((crack_mask_magma_pil_l.size[1], crack_mask_magma_pil_l.size[0])).astype(np.uint8)
 print('marker_point_zero_np.shape', marker_point_zero_np.shape, np.unique(marker_point_zero_np))
 
-print('corners[0][0].shape', corners[0][0].shape)
-for i in range(corners[0][0].shape[0]):
-    # i = int(i)
-    # print(i, corners[0][0][i][0], corners[0][0][i][1])
-    marker_point_zero_np[int(corners[0][0][i][1]), int(corners[0][0][i][0])] = 1
+if img_name == '0032':
+    print('corners[0][0].shape', corners[0][0].shape)
+    for i in range(corners[0][0].shape[0]):
+        # i = int(i)
+        # print(i, corners[0][0][i][0], corners[0][0][i][1])
+        marker_point_zero_np[int(corners[0][0][i][1]), int(corners[0][0][i][0])] = 1
 # marker_point_zero_np[corners[0][0][0][1], corners[0][0][0][0]] = 1
 # marker_point_zero_np[corners[0][0][1][1], corners[0][0][1][0]] = 1
 # marker_point_zero_np[corners[0][0][2][1], corners[0][0][2][0]] = 1
@@ -827,6 +831,8 @@ elif mesh_dir is not None and camera_center_coords is not None:
     vizualizer.add_geometry(mesh)
     hit_points = []
     hit_points_colors = []
+    print('directions.shape:', directions.shape)
+    print('t_hits.shape:', t_hits.shape)
     for i in range(len(directions)):
         if np.isfinite(t_hits[i]):
             hit_point = chosen_camera_center_coords[0] + directions[i] * t_hits[i]
@@ -859,20 +865,21 @@ elif mesh_dir is not None and camera_center_coords is not None:
     scene_points = np.vstack((scene_points, world_coords, camera_center_points, hit_points))
     pcd.points = o3d.utility.Vector3dVector(scene_points)
     print('Number of hit_points:', len(hit_points))
-    marker_list = hit_points[-4:]
-    p1 = marker_list[0]
-    p2 = marker_list[1]
-    p3 = marker_list[2]
-    p4 = marker_list[3]
-    
-    dist1 = distance(p1, p2)
-    dist2 = distance(p2, p3)
-    dist3 = distance(p3, p4)
-    dist4 = distance(p4, p1)
-    
-    mmp3dp = 132.0 / dist1
-    print(f'dist1: {dist1}, dist2: {dist2}, dist3: {dist3}, dist4: {dist4}')
-    print(f'真实尺寸 / 3D点云尺寸： 16.5x8 / dist1 = 132.0 / {dist1} = {mmp3dp} mmp3dp(mm per 3D point)')
+    if img_name == '0032':
+        marker_list = hit_points[-4:]
+        p1 = marker_list[0]
+        p2 = marker_list[1]
+        p3 = marker_list[2]
+        p4 = marker_list[3]
+        
+        dist1 = distance(p1, p2)
+        dist2 = distance(p2, p3)
+        dist3 = distance(p3, p4)
+        dist4 = distance(p4, p1)
+        
+        mmp3dp = 132.0 / dist1
+        print(f'dist1: {dist1}, dist2: {dist2}, dist3: {dist3}, dist4: {dist4}')
+        print(f'真实尺寸 / 3D点云尺寸： 16.5x8 / dist1 = 132.0 / {dist1} = {mmp3dp} mmp3dp(mm per 3D point)')
     
     # 按照类别对hitpoints存储
     cls_hitpoints_dict = {}
@@ -914,14 +921,24 @@ elif mesh_dir is not None and camera_center_coords is not None:
             print(f"No crack edge found for class={e} in img_name={img_name}")
             continue
     # 存储hit_points
-    pcd_color_dict = {'all_points_list': hit_points,
-                  'all_colors_list' : crack_mask_magma_np_color_not_zero_list,
-                  'only_defects_cls_length': cls_num_of_points_and_colors_dict,
-                  'each_cls_num_points': cls_hitpoints_dict,
-                  'each_cls_colors': cls_hitpoints_color_dict,
-                  'cls_dist_each_3d_point_dict': cls_dist_each_3d_point_dict,
-                  'cls_center_points_dict': cls_center_points_dict,
-                  'mmp3dp': mmp3dp}
+    if img_name == '0032':
+        pcd_color_dict = {'all_points_list': hit_points,
+                    'all_colors_list' : crack_mask_magma_np_color_not_zero_list,
+                    'only_defects_cls_length': cls_num_of_points_and_colors_dict,
+                    'each_cls_num_points': cls_hitpoints_dict,
+                    'each_cls_colors': cls_hitpoints_color_dict,
+                    'cls_dist_each_3d_point_dict': cls_dist_each_3d_point_dict,
+                    'cls_center_points_dict': cls_center_points_dict,
+                    'mmp3dp': mmp3dp}
+    else:
+        pcd_color_dict = {'all_points_list': hit_points,
+            'all_colors_list' : crack_mask_magma_np_color_not_zero_list,
+            'only_defects_cls_length': cls_num_of_points_and_colors_dict,
+            'each_cls_num_points': cls_hitpoints_dict,
+            'each_cls_colors': cls_hitpoints_color_dict,
+            'cls_dist_each_3d_point_dict': cls_dist_each_3d_point_dict,
+            'cls_center_points_dict': cls_center_points_dict,
+            }
 
     npy_save_dir = os.path.join(f'{save_output_mesh_ray_dir}', f'hit_points_from_2d_npy_with_markers')
     os.makedirs(npy_save_dir, exist_ok=True)
